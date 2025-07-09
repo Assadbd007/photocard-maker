@@ -1,0 +1,355 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>বালেরকণ্ঠ ফটোকার্ড</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <link href="https://fonts.maateen.me/noto-serif-bengali/font.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Noto Serif Bengali', serif;
+            width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .upload-section {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            display: inline-block;
+            cursor: pointer;
+            background: #007bff;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        .file-input-wrapper:hover {
+            background: #0056b3;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 510px;
+            border: 3px dashed #ddd;
+            border-radius: 10px;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .image-preview.has-image {
+            border-radius: 95px 10px 95px 0px;
+        }
+
+        .placeholder-text {
+            text-align: center;
+            line-height: 1.6;
+        }
+
+        .caption-section {
+            margin-top: 20px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            justify-content: center;
+        }
+
+        .screenshot-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .screenshot-btn:hover {
+            background: #218838;
+        }
+
+        .screenshot-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+
+        #fake-screenshot-area {
+            width: 1000px;
+            height: 1000px;
+        }
+
+        .clear-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-left: 10px;
+            transition: background 0.3s;
+        }
+
+        .clear-btn:hover {
+            background: #c82333;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        .bk-template {
+            background-size: cover;
+            background-position: center;
+            padding-top: 106px;
+            padding-left: 60px;
+            padding-right: 63px;
+        }
+
+        .caption {
+            font-size: 55px;
+            font-weight: 700;
+            line-height: 72px;
+            text-align: center;
+        }
+        div#imagePreview {
+            margin-bottom: 25px;
+            border-radius: 95px 0 95px 0;
+        }
+        div#imagePreview.has-image {
+            border: none;
+        }
+        .caption-wrapper {
+            display: flex;
+            align-items: center;
+            height: 280px;
+        }
+        div#fake-screenshot-area {
+            position: relative;
+        }
+
+        .date {
+            position: absolute;
+            bottom: 15px;
+            left: 0;
+            font-size: 25px;
+            font-weight: 700;
+            padding: 0 30px;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>বালেরকণ্ঠ ফটোকার্ড</h1>
+    <p style="text-align: center;margin-bottom: 40px">ছবি আপলোড করুন, ক্যাপশন, তারিখ চেঞ্জ করে ডাউনলোড করুন। ফেসবুকে আপলোড করার পর কমেন্টে শুধু লিখবেন "বিস্তারিত"। </p>
+
+    <div class="upload-section">
+        <label class="file-input-wrapper">
+            <input type="file" id="imageInput" accept="image/*">
+            ছবি আপলোড 
+        </label>
+        <button class="clear-btn" id="clearBtn" style="display: none;">ক্লিয়ার করুন</button>
+    </div>
+    
+    <div id="fake-screenshot-area" class="bk-template" style="background-image: url('/tools/fotocard/assets/bk-template.png')">
+        <div class="image-preview" id="imagePreview">
+            <div class="placeholder-text">
+                📷<br>
+                উপরের নীল বাটনে ক্লিক করে অথবা এখানে ছবি এনে ছেড়ে দিন<br>
+                <small>JPG, PNG, GIF, BMP, WebP ফরম্যাটের ছবিগুলা সাপোর্ট করবে</small>
+            </div>
+        </div>
+
+        <div class="caption-wrapper">
+            <p class="caption" contenteditable="true">গনমাধ্যমের অপসাংবাদিকতার পক্ষে বিবৃতি দিলেন একঝাঁক হলুদ সাংবাদিক </p>
+        </div>
+        
+        <div contenteditable="true" id="today" class="date">০৮ জুলাই ২০২৫</div>
+    </div>
+
+
+
+    <div class="caption-section">
+        <div class="action-buttons">
+            <button class="screenshot-btn" id="download-screenshot" disabled>ডাউনলোড করুন</button>
+        </div>
+    </div>
+
+    <p style="text-align: center;margin-top: 40px">এআই দিয়ে নির্মিত। আমার কোন দোষ নাই। </p>
+</div>
+
+<script>
+    const imageInput = document.getElementById('imageInput');
+    const imagePreview = document.getElementById('imagePreview');
+    const clearBtn = document.getElementById('clearBtn');
+    const downloadBtn = document.getElementById('download-screenshot');
+
+    let currentImageUrl = null;
+
+    function getBanglaDate() {
+        const banglaDigits = ['০','১','২','৩','৪','৫','৬','৭','৮','৯'];
+        const banglaMonths = [
+            "জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন",
+            "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"
+        ];
+
+        const now = new Date();
+
+        const day = now.getDate().toString().split('').map(d => banglaDigits[d]).join('');
+        const month = banglaMonths[now.getMonth()];
+        const year = now.getFullYear().toString().split('').map(d => banglaDigits[d]).join('');
+
+        return `${day} ${month} ${year}`;
+    }
+
+    // set date in #today
+    document.getElementById('today').textContent = getBanglaDate();
+
+    // Handle file selection
+    imageInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select a valid image file!');
+                return;
+            }
+
+            clearBtn.style.display = 'inline-block';
+
+            // Create FileReader to read the file
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                // Set the image as background
+                currentImageUrl = e.target.result;
+                imagePreview.style.backgroundImage = `url("${currentImageUrl}")`;
+                imagePreview.classList.add('has-image');
+                imagePreview.innerHTML = ''; // Remove placeholder text
+
+                // Enable screenshot button
+                downloadBtn.disabled = false;
+            };
+
+            // Read the file as data URL
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Clear button functionality
+    clearBtn.addEventListener('click', function() {
+        imageInput.value = '';
+        imagePreview.style.backgroundImage = '';
+        imagePreview.classList.remove('has-image');
+        imagePreview.innerHTML = `
+                <div class="placeholder-text">
+                    📷<br>
+                    ছবি আপলোড বাটনে ক্লিক করে অথবা এখানে ছবি এনে ছেড়ে দিন<br>
+                    <small>JPG, PNG, GIF, BMP, WebP ফরম্যাটের ছবিগুলা সাপোর্ট করবে</small>
+                </div>
+            `;
+        clearBtn.style.display = 'none';
+        downloadBtn.disabled = true;
+        currentImageUrl = null;
+    });
+
+    // Drag and drop functionality
+    imagePreview.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        imagePreview.style.borderColor = '#007bff';
+        imagePreview.style.backgroundColor = '#f8f9fa';
+    });
+
+    imagePreview.addEventListener('dragleave', function(e) {
+        e.preventDefault();
+        imagePreview.style.borderColor = '#ddd';
+        imagePreview.style.backgroundColor = 'transparent';
+    });
+
+    imagePreview.addEventListener('drop', function(e) {
+        e.preventDefault();
+        imagePreview.style.borderColor = '#ddd';
+        imagePreview.style.backgroundColor = 'transparent';
+
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+            const file = files[0];
+            if (file.type.startsWith('image/')) {
+                imageInput.files = files;
+                imageInput.dispatchEvent(new Event('change'));
+            } else {
+                alert('Please drop a valid image file!');
+            }
+        }
+    });
+
+
+    document.getElementById("download-screenshot").addEventListener("click", function () {
+        const target = document.getElementById("fake-screenshot-area");
+
+        html2canvas(target, { scale: 1 }).then(originalCanvas => {
+            // Create a new canvas with desired output size
+            const outputCanvas = document.createElement("canvas");
+            const ctx = outputCanvas.getContext("2d");
+
+            outputCanvas.width = 1000;
+            outputCanvas.height = 1000;
+
+            // Scale and draw the original canvas into the output canvas
+            ctx.drawImage(originalCanvas, 0, 0, outputCanvas.width, outputCanvas.height);
+
+            // Convert to image and trigger download
+            const imgData = outputCanvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = imgData;
+            link.download = "screenshot-1200x630.png";
+            link.click();
+        });
+    });
+</script>
+</body>
+</html>
